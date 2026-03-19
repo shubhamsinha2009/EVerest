@@ -70,12 +70,12 @@ public:
     /// \param security_configuration specifies the file paths that are required to set up the internal evse_security
     /// implementation
     /// \param message_callback A callback that will get all OCPP messages send or received to/from the CSMS
-    explicit ChargePoint(ChargePointConfigurationInterface& cfg, const fs::path& share_path,
-                         const fs::path& database_path, const fs::path& sql_init_path, const fs::path& message_log_path,
-                         const std::shared_ptr<EvseSecurity> evse_security,
-                         const std::optional<SecurityConfiguration> security_configuration = std::nullopt,
-                         const std::function<void(const std::string& message, MessageDirection direction)>& message_callback = nullptr
-                        );
+    explicit ChargePoint(
+        ChargePointConfigurationInterface& cfg, const fs::path& share_path, const fs::path& database_path,
+        const fs::path& sql_init_path, const fs::path& message_log_path,
+        const std::shared_ptr<EvseSecurity> evse_security,
+        const std::optional<SecurityConfiguration> security_configuration = std::nullopt,
+        const std::function<void(const std::string& message, MessageDirection direction)>& message_callback = nullptr);
 
     virtual ~ChargePoint();
 
