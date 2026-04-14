@@ -413,6 +413,7 @@ bool evse_managerImpl::handle_resume_charging() {
 };
 
 bool evse_managerImpl::handle_stop_transaction(types::evse_manager::StopTransactionRequest& request) {
+    EVLOG_info << "Handling stop_transaction request";
     return mod->charger->cancel_transaction(request);
 };
 
