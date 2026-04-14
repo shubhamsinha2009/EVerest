@@ -196,6 +196,10 @@ requires:
     interface: external_energy_limits
     min_connections: 0
     max_connections: 128
+  evse_board_support:
+    interface: evse_board_support
+    min_connections: 1
+    max_connections: 128
 enable_external_mqtt: true
 metadata:
   license: https://opensource.org/licenses/Apache-2.0
