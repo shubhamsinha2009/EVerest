@@ -555,6 +555,7 @@ void API::init() {
 
         std::string cmd_stop_charging = cmd_base + "stop_charging";
         this->mqtt.subscribe(cmd_stop_charging, [this, &evse](const std::string& data) {
+            EVLOG_info << "Received stop_charging command via API";
             this->evse_manager_check.wait_ready();
 
             types::evse_manager::StopTransactionRequest request;
@@ -661,6 +662,7 @@ void API::init() {
                         EVLOG_error << "Could not parse duration for replug, using " << ms << ", error: " << e.what();
                     }
                 }
+                EVLOG_info << "Received replug command via API (ms: " << ms << ")";
                 this->evse_manager_check.wait_ready();
                 bsp->call_evse_replug(ms);
             });
