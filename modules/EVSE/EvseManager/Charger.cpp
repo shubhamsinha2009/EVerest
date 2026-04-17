@@ -208,9 +208,6 @@ void Charger::run_state_machine() {
         case EvseState::Replug:
             if (initialize_state) {
                 signal_simple_event(types::evse_manager::SessionEventEnum::ReplugStarted);
-                clear_errors_on_unplug();
-                bcb_toggle_reset();
-                signal_slac_reset();
                 // start timer in case we need to
                 if (shared_context.ac_with_soc_timeout) {
                     shared_context.ac_with_soc_timer = 120000;
