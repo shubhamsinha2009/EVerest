@@ -961,6 +961,7 @@ void Charger::process_cp_events_state(CPEvent cp_event) {
 void Charger::process_cp_events_independent(CPEvent cp_event) {
     switch (cp_event) {
     case CPEvent::EvseReplugStarted:
+        process_cp_events_independent(CPEvent::CarUnplugged);
         shared_context.current_state = EvseState::Replug;
         break;
     case CPEvent::EvseReplugFinished:
