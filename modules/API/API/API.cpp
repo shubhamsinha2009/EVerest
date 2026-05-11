@@ -376,6 +376,11 @@ void API::init() {
             this->selected_protocol = selected_protocol;
         });
 
+        std::string var_car_manufacturer = var_base + "car_manufacturer";
+        evse->subscribe_car_manufacturer([this, var_car_manufacturer](const std::string& car_manufacturer) {
+            this->mqtt.publish(var_car_manufacturer, car_manufacturer);
+        });
+
         evse->subscribe_error(
             "evse_manager/Inoperative",
             [this, &session_info](const Everest::error::Error&) { session_info->set_permanent_fault(true); },
