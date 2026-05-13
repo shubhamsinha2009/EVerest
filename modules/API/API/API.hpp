@@ -17,6 +17,7 @@
 #include <generated/interfaces/evse_manager/Interface.hpp>
 #include <generated/interfaces/external_energy_limits/Interface.hpp>
 #include <generated/interfaces/ocpp/Interface.hpp>
+#include <generated/interfaces/power_supply_DC/Interface.hpp>
 #include <generated/interfaces/uk_random_delay/Interface.hpp>
 
 // ev@4bf81b14-a215-475c-a1d3-0a484ae48918:v1
@@ -162,7 +163,8 @@ public:
         std::vector<std::unique_ptr<uk_random_delayIntf>> r_random_delay,
         std::vector<std::unique_ptr<error_historyIntf>> r_error_history,
         std::vector<std::unique_ptr<external_energy_limitsIntf>> r_evse_energy_sink,
-        std::vector<std::unique_ptr<evse_board_supportIntf>> r_evse_board_support, Conf& config) :
+        std::vector<std::unique_ptr<evse_board_supportIntf>> r_evse_board_support,
+        std::vector<std::unique_ptr<power_supply_DCIntf>> r_power_supply_DC, Conf& config) :
         ModuleBase(info),
         mqtt(mqtt_provider),
         r_charger_information(std::move(r_charger_information)),
@@ -172,6 +174,7 @@ public:
         r_error_history(std::move(r_error_history)),
         r_evse_energy_sink(std::move(r_evse_energy_sink)),
         r_evse_board_support(std::move(r_evse_board_support)),
+        r_power_supply_DC(std::move(r_power_supply_DC)),
         config(config){};
 
     Everest::MqttProvider& mqtt;
@@ -182,6 +185,7 @@ public:
     const std::vector<std::unique_ptr<error_historyIntf>> r_error_history;
     const std::vector<std::unique_ptr<external_energy_limitsIntf>> r_evse_energy_sink;
     const std::vector<std::unique_ptr<evse_board_supportIntf>> r_evse_board_support;
+    const std::vector<std::unique_ptr<power_supply_DCIntf>> r_power_supply_DC;
     const Conf& config;
 
     // ev@1fce4c5e-0ab8-41bb-90f7-14277703d2ac:v1
