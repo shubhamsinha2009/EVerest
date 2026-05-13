@@ -2,6 +2,7 @@
 // Copyright 2020 - 2022 Pionix GmbH and Contributors to EVerest
 #include "API.hpp"
 #include <everest/external_energy_limits/external_energy_limits.hpp>
+#include <generated/types/power_supply_DC.hpp>
 #include <utils/date.hpp>
 #include <utils/yaml_loader.hpp>
 
@@ -388,8 +389,8 @@ void API::init() {
         });
 
         std::string var_car_manufacturer = var_base + "car_manufacturer";
-        evse->subscribe_car_manufacturer([this, var_car_manufacturer](const std::string& car_manufacturer) {
-            this->mqtt.publish(var_car_manufacturer, car_manufacturer);
+        evse->subscribe_car_manufacturer([this, var_car_manufacturer](types::evse_manager::CarManufacturer car_manufacturer) {
+            this->mqtt.publish(var_car_manufacturer, types::evse_manager::car_manufacturer_to_string(car_manufacturer));
         });
 
         evse->subscribe_error(
@@ -707,6 +708,14 @@ void API::init() {
             }
         }
         evse_id++;
+    }
+
+    for (auto& ps : this->r_power_supply_DC) {
+        std::string var_voltage_current = this->api_base + ps->module_id + "/var/voltage_current";
+        ps->subscribe_voltage_current([this, var_voltage_current](types::power_supply_DC::VoltageCurrent vc) {
+            json vc_json = vc;
+            this->mqtt.publish(var_voltage_current, vc_json.dump());
+        });
     }
 
     std::string var_ocpp_connection_status = this->api_base + "ocpp/var/connection_status";
