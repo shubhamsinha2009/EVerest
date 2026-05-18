@@ -92,6 +92,13 @@ config:
     type: integer
     minimum: 0
     default: 400
+  dc_charging_imd_grace_period_s:
+    description: >-
+      Grace period in seconds after entering active Charging state during which isolation resistance
+      measurements below the limit are ignored to prevent false trips from startup transients.
+      Set to 0 to disable.
+    type: integer
+    default: 10
   dbg_hlc_auth_after_tstep:
     description: >-
       Special mode: send HLC auth ok only after t_step_XX is finished (true) or directly when available (false)
