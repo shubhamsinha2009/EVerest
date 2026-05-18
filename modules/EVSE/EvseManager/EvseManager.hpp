@@ -72,6 +72,7 @@ struct Conf {
     bool ac_enforce_hlc;
     bool ac_with_soc;
     int dc_isolation_voltage_V;
+    int dc_charging_imd_grace_period_s;
     bool dbg_hlc_auth_after_tstep;
     int hack_sleep_in_cable_check;
     int hack_sleep_in_cable_check_volkswagen;
@@ -362,6 +363,9 @@ private:
     static constexpr double CABLECHECK_INSULATION_FAULT_RESISTANCE_OHM{100000.};
     static constexpr double CABLECHECK_SAFE_VOLTAGE{60.};
     static constexpr int CABLECHECK_SELFTEST_TIMEOUT{30};
+
+    std::chrono::time_point<std::chrono::steady_clock> last_charging_state_change_time;
+    Charger::EvseState last_evse_state{Charger::EvseState::Idle};
 
     std::atomic_bool current_demand_active{false};
     std::atomic_bool slac_unmatched{false};

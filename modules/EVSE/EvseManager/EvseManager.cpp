@@ -363,14 +363,35 @@ void EvseManager::ready() {
 
                 r_imd[0]->subscribe_isolation_measurement([this](types::isolation_monitor::IsolationMeasurement m) {
                     // new DC isolation monitoring measurement received
+                    auto current_state = charger->get_current_state();
 
                     // Are we in charge loop?
-                    if (charger->get_current_state() == Charger::EvseState::Charging and
-                        not check_isolation_resistance_in_range(m.resistance_F_Ohm)) {
-                        charger->set_hlc_error();
-                        error_handling->raise_isolation_resistance_fault(
-                            fmt::format("Isolation resistance too low during charging: {} Ohm", m.resistance_F_Ohm));
-                        r_hlc[0]->call_send_error(types::iso15118::EvseError::Error_EmergencyShutdown);
+                    if (current_state == Charger::EvseState::Charging) {
+                        if (last_evse_state != Charger::EvseState::Charging) {
+                            last_charging_state_change_time = std::chrono::steady_clock::now();
+                            last_evse_state = Charger::EvseState::Charging;
+                            EVLOG_info << "EvseManager: Entered Charging state, starting grace period timer";
+                        }
+
+                        if (config.dc_charging_imd_grace_period_s > 0) {
+                            auto elapsed_s = std::chrono::duration_cast<std::chrono::seconds>(
+                                std::chrono::steady_clock::now() - last_charging_state_change_time).count();
+                            if (elapsed_s < config.dc_charging_imd_grace_period_s) {
+                                EVLOG_info << "EvseManager: Suppressing isolation measurement during charging grace period ("
+                                           << elapsed_s << "/" << config.dc_charging_imd_grace_period_s << "s), value: "
+                                           << m.resistance_F_Ohm << " Ohm";
+                                return;
+                            }
+                        }
+
+                        if (not check_isolation_resistance_in_range(m.resistance_F_Ohm)) {
+                            charger->set_hlc_error();
+                            error_handling->raise_isolation_resistance_fault(
+                                fmt::format("Isolation resistance too low during charging: {} Ohm", m.resistance_F_Ohm));
+                            r_hlc[0]->call_send_error(types::iso15118::EvseError::Error_EmergencyShutdown);
+                        }
+                    } else {
+                        last_evse_state = current_state;
                     }
                     isolation_measurement = m;
                 });
