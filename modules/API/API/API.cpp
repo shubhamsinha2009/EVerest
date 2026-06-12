@@ -580,24 +580,6 @@ void API::init() {
             evse->call_force_unlock(connector_id);
         });
 
-        if (this->r_evse_board_support.size() >= evse_id) {
-            auto& bsp = this->r_evse_board_support.at(evse_id - 1);
-            std::string cmd_replug = cmd_base + "replug";
-            this->mqtt.subscribe(cmd_replug, [this, &bsp](const std::string& data) {
-                int ms = 500;
-                if (!data.empty()) {
-                    try {
-                        ms = std::stoi(data);
-                    } catch (const std::exception& e) {
-                        EVLOG_error << "Could not parse duration for replug, using " << ms << ", error: " << e.what();
-                    }
-                }
-                EVLOG_info << "Received replug command via API (ms: " << ms << ")";
-                this->evse_manager_check.wait_ready();
-                bsp->call_evse_replug(ms);
-            });
-        }
-
         // Check if a uk_random_delay is connected that matches this evse_manager
         for (const auto& random_delay : this->r_random_delay) {
             if (random_delay->module_id == evse->module_id) {
