@@ -580,7 +580,6 @@ void API::init() {
             evse->call_force_unlock(connector_id);
         });
 
-        const auto evse_id = evse->call_get_evse().id;
         if (this->r_evse_board_support.size() >= evse_id) {
             auto& bsp = this->r_evse_board_support.at(evse_id - 1);
             std::string cmd_replug = cmd_base + "replug";
