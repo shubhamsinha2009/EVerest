@@ -15,6 +15,8 @@
 // ev@75ac1216-19eb-4182-a85c-820f1fc2c091:v1
 // insert your custom include headers here
 #include "pn532_serial/PN532Serial.h"
+#include <chrono>
+#include <string>
 // ev@75ac1216-19eb-4182-a85c-820f1fc2c091:v1
 
 namespace module {
@@ -25,6 +27,7 @@ struct Conf {
     int baud_rate;
     int read_timeout;
     bool debug;
+    int debounce_timeout;
 };
 
 class auth_token_providerImpl : public auth_token_providerImplBase {
@@ -56,6 +59,8 @@ private:
     // ev@3370e4dd-95f4-47a9-aaec-ea76f34a66c9:v1
     // insert your private definitions here
     PN532Serial serial;
+    std::string last_published_token;
+    std::chrono::steady_clock::time_point last_publish_time;
     // ev@3370e4dd-95f4-47a9-aaec-ea76f34a66c9:v1
 };
 

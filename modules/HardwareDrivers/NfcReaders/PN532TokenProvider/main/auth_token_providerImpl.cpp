@@ -66,8 +66,20 @@ void auth_token_providerImpl::ready() {
                 std::dynamic_pointer_cast<InListPassiveTargetResponse>(in_list_passive_target_response.message);
             auto target_data = in_list_passive_target_response_message->target_data;
             for (auto entry : target_data) {
+                std::string token_val = entry.getNFCID();
+                auto now = std::chrono::steady_clock::now();
+                if (token_val == this->last_published_token &&
+                    std::chrono::duration_cast<std::chrono::seconds>(now - this->last_publish_time).count() < config.debounce_timeout) {
+                    if (config.debug) {
+                        EVLOG_info << "Debouncing rfid/nfc token: " << token_val;
+                    }
+                    continue;
+                }
+                this->last_published_token = token_val;
+                this->last_publish_time = now;
+
                 types::authorization::ProvidedIdToken provided_token;
-                provided_token.id_token = {entry.getNFCID(), types::authorization::IdTokenType::ISO14443};
+                provided_token.id_token = {token_val, types::authorization::IdTokenType::ISO14443};
                 provided_token.authorization_type = types::authorization::AuthorizationType::RFID;
                 if (config.debug) {
                     EVLOG_info << "Publishing new rfid/nfc token: " << everest::helpers::redact(provided_token);

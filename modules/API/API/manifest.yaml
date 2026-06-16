@@ -204,6 +204,10 @@ requires:
     interface: power_supply_DC
     min_connections: 0
     max_connections: 128
+  gpio_controller:
+    interface: gpio_controller
+    min_connections: 0
+    max_connections: 128
 enable_external_mqtt: true
 metadata:
   license: https://opensource.org/licenses/Apache-2.0

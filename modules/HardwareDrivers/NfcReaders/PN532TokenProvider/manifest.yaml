@@ -24,6 +24,12 @@ provides:
         description: Show debug output on command line.
         type: boolean
         default: false
+      debounce_timeout:
+        description: Time within which duplicate card reads are ignored (in s)
+        type: integer
+        minimum: 0
+        maximum: 60
+        default: 5
 metadata:
   license: https://opensource.org/licenses/Apache-2.0
   authors:
