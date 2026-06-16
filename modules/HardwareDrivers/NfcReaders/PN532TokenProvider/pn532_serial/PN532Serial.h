@@ -77,6 +77,8 @@ public:
     std::future<PN532Response> getFirmwareVersion();
     std::future<PN532Response> inListPassiveTarget();
     void enableDebug();
+    std::string hexdump(const std::uint8_t* const msg, int msg_len) const override;
+    std::string hexdump(const std::vector<std::uint8_t>& msg) const override;
 
 private:
     static constexpr uint8_t PREAMBLE = 0x00;

@@ -683,6 +683,22 @@ void API::init() {
                 std::this_thread::sleep_until(next_tick);
             }
         });
+
+    std::string cmd_replug = "everest_api/gpio_controller/cmd/replug";
+    this->mqtt.subscribe(cmd_replug, [this](const std::string& data) {
+        int duration_ms = 2000;
+        if (!data.empty()) {
+            try {
+                duration_ms = std::stoi(data);
+            } catch (const std::exception& e) {
+                EVLOG_error << "Could not parse duration_ms for manual replug: " << e.what();
+            }
+        }
+        EVLOG_info << "Received manual replug command via API, duration: " << duration_ms << "ms";
+        for (const auto& controller : this->r_gpio_controller) {
+            controller->call_trigger_replug(duration_ms);
+        }
+    });
 }
 
 void API::ready() {

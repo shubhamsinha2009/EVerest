@@ -23,6 +23,7 @@ struct Conf {
     std::string validation_result;
     std::string validation_reason;
     double sleep;
+    std::string allowed_tokens;
 };
 
 class auth_token_validatorImpl : public auth_token_validatorImplBase {

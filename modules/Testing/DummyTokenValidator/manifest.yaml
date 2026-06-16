@@ -26,6 +26,10 @@ provides:
         minimum: 0
         maximum: 120
         default: 0.5
+      allowed_tokens:
+        description: Comma-separated list of allowed token UIDs (or prefixes). If empty, all tokens are accepted.
+        type: string
+        default: ""
 metadata:
   license: https://opensource.org/licenses/Apache-2.0
   authors:

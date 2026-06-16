@@ -329,3 +329,16 @@ bool PN532Serial::reset() {
 void PN532Serial::enableDebug() {
     this->debug = true;
 }
+
+std::string PN532Serial::hexdump(const std::uint8_t* const msg, int msg_len) const {
+    std::stringstream ss;
+    ss << std::hex << std::setfill('0');
+    for (int i = 0; i < msg_len; ++i) {
+        ss << "0x" << std::setw(2) << static_cast<int>(msg[i]) << " ";
+    }
+    return ss.str();
+}
+
+std::string PN532Serial::hexdump(const std::vector<std::uint8_t>& msg) const {
+    return hexdump(msg.data(), msg.size());
+}

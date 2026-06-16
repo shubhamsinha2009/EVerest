@@ -1,0 +1,12 @@
+description: "Interface for managing general purpose digital I/O for the ChargeSOM platform."
+vars:
+  ch_stop_requested:
+    description: "Signals that a charge stop has been requested via a physical input (e.g. Stop Button)."
+    type: boolean
+cmds:
+  trigger_replug:
+    description: "Triggers a manual physical replug sequence."
+    arguments:
+      duration_ms:
+        description: "Duration of the replug in milliseconds."
+        type: integer
