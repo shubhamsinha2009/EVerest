@@ -686,7 +686,7 @@ void API::init() {
 
     std::string cmd_replug = "everest_api/gpio_controller/cmd/replug";
     this->mqtt.subscribe(cmd_replug, [this](const std::string& data) {
-        int duration_ms = 15000;
+        int duration_ms = 500;
         if (!data.empty()) {
             try {
                 duration_ms = std::stoi(data);
