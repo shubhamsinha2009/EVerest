@@ -684,9 +684,9 @@ void API::init() {
             }
         });
 
-    std::string cmd_replug = "everest_api/gpio_controller/cmd/replug";
+    std::string cmd_replug = "everest_api/bsp/cmd/replug";
     this->mqtt.subscribe(cmd_replug, [this](const std::string& data) {
-        int duration_ms = 500;
+        int duration_ms = 5000; // default 15s replug
         if (!data.empty()) {
             try {
                 duration_ms = std::stoi(data);
@@ -694,10 +694,29 @@ void API::init() {
                 EVLOG_error << "Could not parse duration_ms for manual replug: " << e.what();
             }
         }
-        EVLOG_info << "Received manual replug command via API, duration: " << duration_ms << "ms";
-        for (const auto& controller : this->r_gpio_controller) {
-            controller->call_trigger_replug(duration_ms);
+        EVLOG_info << "Received manual software replug command via API, duration: " << duration_ms << "ms";
+        for (const auto& bsp : this->r_evse_board_support) {
+            try {
+                EVLOG_info << "Disabling safety MCU (forcing CP to State E)...";
+                bsp->call_cp_state_E();
+            } catch (const std::exception& e) {
+                EVLOG_error << "Failed to trigger cp_state_E on BSP: " << e.what();
+            }
         }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(duration_ms));
+
+        for (const auto& bsp : this->r_evse_board_support) {
+            try {
+                EVLOG_info << "Re-enabling safety MCU...";
+                bsp->call_enable(true);
+                EVLOG_info << "Setting CP to State A...";
+                bsp->call_cp_state_X1();
+            } catch (const std::exception& e) {
+                EVLOG_error << "Failed to enable/restore BSP: " << e.what();
+            }
+        }
+        EVLOG_info << "Manual software replug completed.";
     });
 }
 
