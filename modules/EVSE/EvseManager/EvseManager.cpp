@@ -963,6 +963,7 @@ void EvseManager::ready() {
                 Everest::scoped_lock_timeout lock(ev_info_mutex,
                                                   Everest::MutexDescription::EVSE_subscribe_dc_ev_status);
                 ev_info.soc = s.dc_ev_ress_soc;
+                EVLOG_info << "SoC received: " << s.dc_ev_ress_soc << "%";
                 p_evse->publish_ev_info(ev_info);
             });
 
