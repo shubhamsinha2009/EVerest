@@ -201,7 +201,8 @@ void EvseManager::init() {
     // Use SLAC MAC address for Autocharge if configured.
     if (config.autocharge_use_slac_instead_of_hlc and slac_enabled and config.enable_autocharge) {
         r_slac[0]->subscribe_ev_mac_address([this](const std::string& token) {
-            p_token_provider->publish_provided_token(create_autocharge_token(token, config.connector_id));
+            this->autocharge_token = create_autocharge_token(token, config.connector_id);
+            p_token_provider->publish_provided_token(this->autocharge_token);
         });
     }
 
@@ -1047,8 +1048,8 @@ void EvseManager::ready() {
                                                       types::authorization::CertificateStatus::NoCertificateAvailable);
                 charger->get_stopwatch().mark("Auth EIM Done");
             } else {
-                if (config.enable_autocharge) {
-                    p_token_provider->publish_provided_token(autocharge_token);
+                if (config.enable_autocharge && !this->autocharge_token.id_token.value.empty()) {
+                    p_token_provider->publish_provided_token(this->autocharge_token);
                 }
                 hlc_waiting_for_auth_eim = true;
                 hlc_waiting_for_auth_pnc = false;

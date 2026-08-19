@@ -8,6 +8,13 @@ namespace module {
 namespace token_validator {
 
 static std::string normalize_token(std::string str) {
+    // 1. Strip comments starting with '#'
+    size_t comment_pos = str.find_first_of("#");
+    if (comment_pos != std::string::npos) {
+        str = str.substr(0, comment_pos);
+    }
+
+    // 2. Strip leading/trailing whitespace, \r, \n
     while (!str.empty() && (str.back() == '\r' || str.back() == '\n' || std::isspace(str.back()))) {
         str.pop_back();
     }
@@ -17,10 +24,21 @@ static std::string normalize_token(std::string str) {
     }
     str = str.substr(start);
 
+    // 3. Strip optional "VID:" or "vid:" prefix
     if (str.rfind("VID:", 0) == 0 || str.rfind("vid:", 0) == 0) {
         str = str.substr(4);
     }
-    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) { return std::toupper(c); });
+
+    // 4. Remove all separators: colons ':', hyphens '-', and spaces ' '
+    str.erase(std::remove_if(str.begin(), str.end(), [](char c) {
+        return c == ':' || c == '-' || c == ' ';
+    }), str.end());
+
+    // 5. Convert to uppercase for strict case-insensitive equality
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
+        return std::toupper(c);
+    });
+
     return str;
 }
 
