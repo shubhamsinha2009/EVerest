@@ -1071,6 +1071,12 @@ void EvseManager::ready() {
         }
 
         r_hlc[0]->subscribe_require_auth_pnc([this](types::authorization::ProvidedIdToken _token) {
+            // Do not publish contract/central token if PnC / contract validation is disabled in configuration
+            if (!pnc_enabled && !central_contract_validation_allowed.load()) {
+                EVLOG_info << "PnC / Contract auth is disabled in configuration. Ignoring contract token.";
+                return;
+            }
+
             // Do we have auth already (i.e. delayed HLC after charging already running)?
 
             std::vector<int> referenced_connectors = {this->config.connector_id};
