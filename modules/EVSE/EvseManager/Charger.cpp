@@ -992,7 +992,23 @@ void Charger::run_state_machine() {
                 break;
             }
 
-            // Charging is stopped now, move on to paused state
+            // 1. Emergency Stop: Non-recoverable in all modes per IEC 61851-23. Must terminate transaction.
+            if (shared_context.shutdown_type == ShutdownType::EmergencyShutdown) {
+                stop_charging_on_fatal_error_internal();
+                EVLOG_info << "EmergencyShutdown: terminating session -> Finished (IEC 61851-23)";
+                set_state(EvseState::Finished);
+                break;
+            }
+
+            // 2. Fatal Hardware Errors in DC Fast Charging:
+            // Once DC contactors open and ISO 15118 TCP link drops, the session cannot resume without replug/re-negotiation.
+            if (config_context.charge_mode == ChargeMode::DC and stop_charging_on_fatal_error_internal()) {
+                EVLOG_info << "DC Fatal Error: ISO session terminated -> Finished";
+                set_state(EvseState::Finished);
+                break;
+            }
+
+            // 3. Recoverable Pauses (AC basic charging, Grid NoEnergy, or ISO 15118-20 UserPause):
             if (not power_available() or shared_context.flag_paused_by_evse or
                 stop_charging_on_fatal_error_internal()) {
                 // Paused was initiated by EVSE, continue to PausedEVSE
