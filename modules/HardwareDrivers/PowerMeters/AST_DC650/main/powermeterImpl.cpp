@@ -18,7 +18,7 @@ inline std::uint16_t get_u16(const std::vector<std::uint8_t>& vec) {
 }
 
 inline std::uint32_t get_u32(const std::vector<std::uint8_t>& vec, std::uint8_t start_index) {
-    if (vec.size() < start_index + 3)
+    if (vec.size() < start_index + 4)
         return 0;
     return (static_cast<std::uint32_t>(vec[start_index + 3]) << 24) |
            (static_cast<std::uint32_t>(vec[start_index + 2]) << 16) |
@@ -27,6 +27,20 @@ inline std::uint32_t get_u32(const std::vector<std::uint8_t>& vec, std::uint8_t 
 
 inline std::uint32_t get_u32(const std::vector<std::uint8_t>& vec) {
     return get_u32(vec, 0);
+}
+
+inline std::int32_t get_i32(const std::vector<std::uint8_t>& vec, std::uint8_t start_index) {
+    if (vec.size() < start_index + 4)
+        return 0;
+    return static_cast<std::int32_t>(
+        (static_cast<std::uint32_t>(vec[start_index + 3]) << 24) |
+        (static_cast<std::uint32_t>(vec[start_index + 2]) << 16) |
+        (static_cast<std::uint32_t>(vec[start_index + 1]) << 8) |
+        static_cast<std::uint32_t>(vec[start_index]));
+}
+
+inline std::int32_t get_i32(const std::vector<std::uint8_t>& vec) {
+    return get_i32(vec, 0);
 }
 
 inline std::uint64_t get_u64(const std::vector<std::uint8_t>& vec, std::uint8_t start_index) {
@@ -522,7 +536,7 @@ ast_app_layer::CommandResult powermeterImpl::process_response(const std::vector<
                 if (part_data_len < 4)
                     break;
                 types::units::Current amp = pm_last_values.current_A.value();
-                amp.DC = (float)get_u32(part_data) / 1000.0; // powermeter reports in [mA]
+                amp.DC = (float)get_i32(part_data) / 1000.0f; // powermeter reports in signed [mA]
                 pm_last_values.current_A = amp;
             } break;
 
